@@ -1,16 +1,28 @@
 import 'package:farm_olx/model/invest_card_dto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InvestCard extends StatefulWidget {
   final InvestCardDTO investCardDTO;
 
   InvestCard({Key? key, required this.investCardDTO}) : super(key: key);
 
+
   @override
   State<InvestCard> createState() => _InvestCardState();
 }
 
 class _InvestCardState extends State<InvestCard> {
+
+  late TextEditingController investAmountController;
+  bool invested = false;
+
+  @override
+  void initState() {
+    investAmountController = TextEditingController();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -41,7 +53,7 @@ class _InvestCardState extends State<InvestCard> {
                   ),
                   Text(
                     widget.investCardDTO.groupName,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
                   rating("4.6")
@@ -96,11 +108,85 @@ class _InvestCardState extends State<InvestCard> {
                         borderRadius: BorderRadius.circular(20.0),
                         color: Colors.deepPurpleAccent),
                     child: MaterialButton(
-                      onPressed: () {},
-                      child: const Text(
+                      onPressed: () {
+                        if (invested) {
+                          return;
+                        }
+                        showModalBottomSheet<void>(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (BuildContext context) {
+                            return Container(
+                              padding: EdgeInsets.only(
+                                bottom: MediaQuery.of(context).viewInsets.bottom,
+                                top: 16,
+                                left: 16,
+                                right: 16,
+                              ),
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Stack(
+                                    children: <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.only(top: 10),
+                                        child: TextField(
+                                          autofocus: true,
+                                          controller: investAmountController,
+                                          onSubmitted: (newValue) {
+                                            print(newValue);
+                                          },
+                                          inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4),],
+                                          textAlign: TextAlign.left,
+                                          decoration: const InputDecoration(
+                                            labelText: "Invested Amount",
+                                            labelStyle: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                            border: OutlineInputBorder(),
+                                            focusedBorder: OutlineInputBorder(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8,),
+                                  const Text(
+                                    'x amount already invested',
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(fontSize: 16, color: Colors.grey, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 16,),
+                                  Container(
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.deepPurple,),
+                                    width: double.infinity,
+                                    child: MaterialButton(
+                                      height: 48,
+                                      onPressed: () {
+                                        invested = true;
+                                        Navigator.pop(context);
+                                        var snackBar = SnackBar(
+                                          content: Text('You have successfully invested ${investAmountController.text} ''rupees!'),
+                                        );
+                                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                      },
+                                      child: const Text('Invest now', style: TextStyle(color: Colors.white,),),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16,),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: !invested ? const Text(
                         "Invest Now",
                         style: TextStyle(color: Colors.white),
-                      ),
+                      ) : const Icon(Icons.done,),
                     ),
                   ),
                 ],
@@ -133,7 +219,7 @@ class _InvestCardState extends State<InvestCard> {
           title,
           style: const TextStyle(color: Colors.grey),
         ),
-        SizedBox(
+        const SizedBox(
           height: 2,
         ),
         Text(

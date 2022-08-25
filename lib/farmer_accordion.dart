@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'fpo_profile.dart';
 
 class MyForm extends StatefulWidget {
   @override
@@ -31,7 +34,10 @@ class _MyFormState extends State<MyForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      appBar: AppBar(title: const Text('Dynamic TextFormFields'),),
+      appBar: AppBar(
+        title: const Text('Register group details'),
+        backgroundColor: Colors.deepPurple,
+      ),
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -43,107 +49,145 @@ class _MyFormState extends State<MyForm> {
                 // name textfield
                 Padding(
                   padding: const EdgeInsets.only(right: 32.0),
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                        hintText: 'Enter group name'
-                    ),
-                    validator: (v){
-                      if(v!.trim().isEmpty) return 'Please enter something';
-                      return null;
-                    },
+                  child: Stack(
+                    children: <Widget>[
+                      Container(
+                        margin: const EdgeInsets.only(top: 10),
+                        child: TextFormField(
+                          controller: _nameController,
+                          validator: (v) {
+                            if (v!.trim().isEmpty) return 'Please enter something';
+                            return null;
+                          },
+                          autofocus: true,
+                          textAlign: TextAlign.left,
+                          decoration: const InputDecoration(
+                            labelText: "Enter group name",
+                            labelStyle: TextStyle(
+                              color: Colors.grey,
+                            ),
+                            border: const OutlineInputBorder(),
+                            focusedBorder: const OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 12,),
                 Padding(
                   padding: const EdgeInsets.only(right: 32.0),
                   child: TextFormField(
                     controller: _cropController,
-                    decoration: const InputDecoration(
-                        hintText: 'Enter crop name'
-                    ),
-                    validator: (v){
-                      if(v!.trim().isEmpty) return 'Please enter something';
+                    validator: (v) {
+                      if (v!.trim().isEmpty) return 'Please enter something';
                       return null;
                     },
+                    autofocus: true,
+                    textAlign: TextAlign.left,
+                    decoration: const InputDecoration(
+                      labelText: "Enter crop name",
+                      labelStyle: TextStyle(
+                        color: Colors.grey,
+                      ),
+                      border: const OutlineInputBorder(),
+                      focusedBorder: const OutlineInputBorder(),
+                    ),
                   ),
                 ),
                 ..._getFriends(),
-                const SizedBox(height: 40,),
-                FlatButton(
-                  onPressed: (){
-                    if(_formKey.currentState!.validate()){
-                      _formKey.currentState!.save();
-                    }
-                  },
-                  child: const Text('Submit'),
-                  color: Colors.green,
+                const SizedBox(
+                  height: 40,
                 ),
-
+                Container(
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.deepPurple,),
+                  width: double.infinity,
+                  child: MaterialButton(
+                    height: 48,
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                          return FpoProfile(
+                            farmersList: farmersList,
+                            acresList: acresList,
+                            idCardList: idCardList,
+                            cropName: _cropController.text,
+                            groupName: _nameController.text,
+                          );
+                        }));
+                      }
+                    },
+                    child: const Text('Submit', style: TextStyle(fontSize: 20,color: Colors.white),),
+                  ),
+                ),
               ],
             ),
           ),
         ),
       ),
-
     );
   }
 
   /// get firends text-fields
-  List<Widget> _getFriends(){
+  List<Widget> _getFriends() {
     List<Widget> friendsTextFields = [];
-    for(int i=0; i<farmersList.length; i++){
-      friendsTextFields.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Row(
-              children: [
-                Expanded(child: FriendTextFields(i)),
-                const SizedBox(width: 16,),
-                // we need add button at last friends row
-                _addRemoveButton(i == farmersList.length-1, i),
-              ],
+    for (int i = 0; i < farmersList.length; i++) {
+      friendsTextFields.add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: FriendTextFields(i)),
+            const SizedBox(
+              height: 16,
             ),
-          )
-      );
+            // we need add button at last friends row
+            _addRemoveButton(i == farmersList.length - 1, i),
+          ],
+        ),
+      ));
     }
     return friendsTextFields;
   }
 
   /// add / remove button
-  Widget _addRemoveButton(bool add, int index){
+  Widget _addRemoveButton(bool add, int index) {
     return InkWell(
-      onTap: (){
-        if(add){
+      onTap: () {
+        if (add) {
           // add new text-fields at the top of all friends textfields
-          farmersList.insert(index+1, "");
-          acresList.insert(index+1, "");
-          idCardList.insert(index+1, "");
-        }
-        else {
+          farmersList.insert(index + 1, "");
+          acresList.insert(index + 1, "");
+          idCardList.insert(index + 1, "");
+        } else {
           farmersList.removeAt(index);
           acresList.removeAt(index);
           idCardList.removeAt(index);
         }
-        setState((){});
+        setState(() {});
       },
       child: Container(
         width: 30,
         height: 30,
         decoration: BoxDecoration(
-          color: (add) ? Colors.green : Colors.red,
+          color: (add) ? Colors.deepPurple : Colors.deepOrange,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Icon((add) ? Icons.add : Icons.remove, color: Colors.white,),
+        child: Icon(
+          (add) ? Icons.add : Icons.remove,
+          color: Colors.white,
+        ),
       ),
     );
   }
-
-
 }
 
 class FriendTextFields extends StatefulWidget {
   final int index;
-  FriendTextFields(this.index);
+
+  const FriendTextFields(this.index);
+
   @override
   _FriendTextFieldsState createState() => _FriendTextFieldsState();
 }
@@ -171,7 +215,6 @@ class _FriendTextFieldsState extends State<FriendTextFields> {
 
   @override
   Widget build(BuildContext context) {
-
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _nameController.text = _MyFormState.farmersList[widget.index] ?? '';
       _acresController.text = _MyFormState.acresList[widget.index] ?? '';
@@ -179,39 +222,96 @@ class _FriendTextFieldsState extends State<FriendTextFields> {
     });
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextFormField(
-          controller: _nameController,
-          onChanged: (v) => _MyFormState.farmersList[widget.index] = v,
-          decoration: const InputDecoration(
-              hintText: 'Enter farmer name'
-          ),
-          validator: (v){
-            if(v!.trim().isEmpty) return 'Please enter something';
-            return null;
-          },
+        Text(
+          "Farmer ${(widget.index + 1).toString()}",
+          textAlign: TextAlign.left,
         ),
-        TextFormField(
-          controller: _acresController,
-          onChanged: (v) => _MyFormState.acresList[widget.index] = v,
-          decoration: const InputDecoration(
-              hintText: 'Enter farm acres'
+        Padding(
+          padding: const EdgeInsets.only(right: 32.0),
+          child: Stack(
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: TextFormField(
+                  controller: _nameController,
+                  onChanged: (v) => _MyFormState.farmersList[widget.index] = v,
+                  validator: (v) {
+                    if (v!.trim().isEmpty) return 'Please enter something';
+                    return null;
+                  },
+                  autofocus: true,
+                  textAlign: TextAlign.left,
+                  decoration: const InputDecoration(
+                    labelText: "Enter farmer name",
+                    labelStyle: TextStyle(
+                      color: Colors.grey,
+                    ),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
           ),
-          validator: (v){
-            if(v!.trim().isEmpty) return 'Please enter something';
-            return null;
-          },
         ),
-        TextFormField(
-          controller: _idCardController,
-          onChanged: (v) => _MyFormState.idCardList[widget.index] = v,
-          decoration: const InputDecoration(
-              hintText: 'Enter PAN number'
+        Padding(
+          padding: const EdgeInsets.only(right: 32.0),
+          child: Stack(
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: TextFormField(
+                  controller: _acresController,
+                  onChanged: (v) => _MyFormState.acresList[widget.index] = v,
+                  validator: (v) {
+                    if (v!.trim().isEmpty) return 'Please enter something';
+                    return null;
+                  },
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(3),],
+                  autofocus: true,
+                  textAlign: TextAlign.left,
+                  decoration: const InputDecoration(
+                    labelText: "Enter farm acres",
+                    labelStyle: TextStyle(
+                      color: Colors.grey,
+                    ),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
           ),
-          validator: (v){
-            if(v!.trim().isEmpty) return 'Please enter something';
-            return null;
-          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 32.0),
+          child: Stack(
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: TextFormField(
+                  controller: _idCardController,
+                  onChanged: (v) => _MyFormState.idCardList[widget.index] = v,
+                  validator: (v) {
+                    if (v!.trim().isEmpty) return 'Please enter something';
+                    return null;
+                  },
+                  autofocus: true,
+                  textAlign: TextAlign.left,
+                  decoration: const InputDecoration(
+                    labelText: "Enter PAN number",
+                    labelStyle: TextStyle(
+                      color: Colors.grey,
+                    ),
+                    border: const OutlineInputBorder(),
+                    focusedBorder: const OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );

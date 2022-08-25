@@ -51,19 +51,44 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('FPO'),
-          backgroundColor: Colors.deepPurple,
-        ),
-        body: Container(
-          alignment: Alignment.center,
-          child: ListView.builder(
-              itemCount: investCardsList.length,
-              itemBuilder: (context, index) {
-                return InvestCard(investCardDTO: investCardsList[index]);
-              }),
+    return MaterialApp(
+      home: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.deepPurple,
+            bottom: const TabBar(
+              tabs: [
+                Tab(text: "Funds List",),
+                Tab(text: "Mutual Farm Exchange",),
+              ],
+            ),
+            title: const Text('Funds'),
+          ),
+          body: TabBarView(
+            children: [
+              SafeArea(
+                child: Scaffold(
+                  body: Container(
+                    alignment: Alignment.center,
+                    child: ListView.builder(
+                        itemCount: investCardsList.length,
+                        itemBuilder: (context, index) {
+                          return InvestCard(investCardDTO: investCardsList[index]);
+                        }),
+                  ),
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset("assets/images/fund_icon.png", height: 100, width: 100,),
+                  const SizedBox(height: 16,),
+                  const Text("Coming soon...", style: TextStyle(fontSize: 20),),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

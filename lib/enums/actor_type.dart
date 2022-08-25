@@ -1,5 +1,5 @@
 
 enum ActorType{
-  FARMER,
+  FPO,
   INVESTOR
 }

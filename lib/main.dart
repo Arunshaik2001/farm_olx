@@ -1,8 +1,8 @@
 import 'package:farm_olx/enter_mobile_number_screen.dart';
-import 'package:farm_olx/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'farmer_accordion.dart';
 import 'firebase_options.dart';
 
 
@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
           if(snapshot.data == null) {
             return EnterMobileNumberScreen();
           }
-          return const HomePage();
+          return MyForm();
         }
       ),
     );
