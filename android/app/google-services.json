@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "490805518885",
+    "project_id": "farmolx",
+    "storage_bucket": "farmolx.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:490805518885:android:25c1110667e951f04055cc",
+        "android_client_info": {
+          "package_name": "com.example.farm_olx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "490805518885-vofl6pv8c5tun62sme67l9ahcu4r2une.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEkYakiqJSQ2gBUqnJOS6fx--NdJuTkzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "490805518885-vofl6pv8c5tun62sme67l9ahcu4r2une.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
