@@ -1,0 +1,5 @@
+
+enum ActorType{
+  FARMER,
+  INVESTOR
+}

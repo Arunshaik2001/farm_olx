@@ -1,3 +1,5 @@
+import 'package:farm_olx/constants/constants.dart';
+import 'package:farm_olx/enums/actor_type.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,11 +14,10 @@ class EnterMobileNumberScreen extends StatefulWidget {
 }
 
 class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
-
   Key? failureAlertKey;
   late TextEditingController emailEditingController;
   late TextEditingController passwordEditingController;
-  late List<String> actorTypeList = ["Farmer","Investor"];
+  late List<String> actorTypeList = ["Farmer", "Investor"];
   late String actorSelected = "";
 
   @override
@@ -45,8 +46,7 @@ class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
               autofocus: true,
               controller: emailEditingController,
               decoration: const InputDecoration(hintText: "Email Address"),
-
-              onSubmitted: (newValue){
+              onSubmitted: (newValue) {
                 print(newValue);
               },
             ),
@@ -55,12 +55,11 @@ class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
               controller: passwordEditingController,
               obscureText: true,
               decoration: const InputDecoration(hintText: "Password"),
-              onSubmitted: (newValue){
+              onSubmitted: (newValue) {
                 print(newValue);
               },
             ),
             DropdownButton<String>(
-
               // Initial Value
               value: actorSelected,
 
@@ -85,31 +84,40 @@ class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
             Padding(
                 padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).viewInsets.bottom)),
-            const SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             Container(
               decoration: BoxDecoration(
-                color: Colors.lightGreen,
-                borderRadius: BorderRadius.circular(20)
-              ),
+                  color: Colors.lightGreen,
+                  borderRadius: BorderRadius.circular(20)),
               child: MaterialButton(
-                onPressed: () async{
+                onPressed: () async {
                   print("onPressed");
                   try {
-                    final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    final credential = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
                       email: emailEditingController.text,
                       password: passwordEditingController.text,
                     );
                     print("${credential.user?.displayName}");
+                    Constants.actorType = actorSelected == "farmer"
+                        ? ActorType.FARMER
+                        : ActorType.INVESTOR;
                   } on FirebaseAuthException catch (e) {
                     if (e.code == 'weak-password') {
                       print('The password provided is too weak.');
                     } else if (e.code == 'email-already-in-use') {
                       print('The account already exists for that email.');
+                      await FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
+                        email: emailEditingController.text,
+                        password: passwordEditingController.text,
+                      );
                     }
                   } catch (e) {
                     print(e);
                   }
-
                 },
                 child: const Text("Next"),
               ),
