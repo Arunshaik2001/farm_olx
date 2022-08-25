@@ -1,3 +1,6 @@
+import 'package:farm_olx/enter_mobile_number_screen.dart';
+import 'package:farm_olx/home_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -8,11 +11,32 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    FirebaseAuth.instance
+        .authStateChanges()
+        .listen((User? user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+      }
+    });
+    super.initState();
+  }
 
   // This widget is the root of your application.
   @override
@@ -31,7 +55,16 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        initialData: null,
+        builder: (context,snapshot) {
+          if(snapshot.data == null) {
+            return EnterMobileNumberScreen();
+          }
+          return const HomePage();
+        }
+      ),
     );
   }
 }
