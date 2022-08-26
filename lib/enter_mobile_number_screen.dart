@@ -1,8 +1,8 @@
 import 'package:farm_olx/constants/constants.dart';
 import 'package:farm_olx/enums/actor_type.dart';
 import 'package:farm_olx/farmer_accordion.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'home_page.dart';
@@ -34,6 +34,7 @@ class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(
@@ -47,12 +48,16 @@ class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
                 height: 48,
               ),
               Image.asset(
-                "assets/images/ic_nurture_logo.png",
+                "assets/icon/icon.png",
                 height: 100,
                 width: 100,
               ),
               const SizedBox(
                 height: 48,
+              ),
+              const Text('Farm Exchange', style: TextStyle(fontSize: 24,),),
+              const SizedBox(
+                height: 20,
               ),
               Stack(
                 children: <Widget>[
@@ -153,26 +158,6 @@ class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
                   actorSelected = value.toString();
                 },
               ),
-              // DropdownButton<String>(
-              //   // Initial Value
-              //   value: actorSelected,
-              //   // Down Arrow Icon
-              //   icon: const Icon(Icons.keyboard_arrow_down),
-              //   // Array list of items
-              //   items: actorTypeList.map((String items) {
-              //     return DropdownMenuItem(
-              //       value: items,
-              //       child: Text(items),
-              //     );
-              //   }).toList(),
-              //   // After selecting the desired option,it will
-              //   // change button value to selected value
-              //   onChanged: (String? newValue) {
-              //     setState(() {
-              //       actorSelected = newValue!;
-              //     });
-              //   },
-              // ),
               Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom)),
               const SizedBox(
                 height: 20,
@@ -183,19 +168,66 @@ class _EnterMobileNumberScreenState extends State<EnterMobileNumberScreen> {
                 child: MaterialButton(
                   onPressed: () async {
                     print("onPressed");
-                    Constants.actorType = actorSelected == "FPO" ? ActorType.FPO : ActorType.INVESTOR;
-                    if (actorSelected == "FPO") {
-                      await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                        return MyForm();
-                      }));
-                    } else {
-                      await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                        return const HomePage();
-                      }));
+                    try {
+                      final credential = await FirebaseAuth.instance
+                          .createUserWithEmailAndPassword(
+                        email: emailEditingController.text,
+                        password: passwordEditingController.text,
+                      );
+                      print("${credential.user?.displayName}");
+                      Constants.actorType = actorSelected == "FPO"
+                          ? ActorType.FPO
+                          : ActorType.INVESTOR;
+                      Constants.actorType = actorSelected == "FPO" ? ActorType.FPO : ActorType.INVESTOR;
+                      if (actorSelected == "FPO") {
+                        await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                          return MyForm();
+                        }));
+                      } else {
+                        await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                          return const HomePage();
+                        }));
+                      }
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'weak-password') {
+                        print('The password provided is too weak.');
+                      } else if (e.code == 'email-already-in-use') {
+                        print('The account already exists for that email.');
+                        try {
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(
+                            email: emailEditingController.text,
+                            password: passwordEditingController.text,
+                          );
+                          Constants.actorType = actorSelected == "FPO"
+                              ? ActorType.FPO
+                              : ActorType.INVESTOR;
+                          Constants.actorType = actorSelected == "FPO" ? ActorType.FPO : ActorType.INVESTOR;
+                          if (actorSelected == "FPO") {
+                            await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                              return MyForm();
+                            }));
+                          } else {
+                            await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                              return const HomePage();
+                            }));
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'wrong-password') {
+                            var snackBar = const SnackBar(
+                              content: Text('Invalid Password!', style: TextStyle(color: Colors.white,),),
+                              backgroundColor: Colors.red,
+                            );
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          }
+                        }
+                      }
+                    } catch (e) {
+                      print(e);
                     }
                   },
                   child: const Text(
-                    "Next",
+                    "Sign in",
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,

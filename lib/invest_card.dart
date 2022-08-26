@@ -15,7 +15,6 @@ class InvestCard extends StatefulWidget {
 class _InvestCardState extends State<InvestCard> {
 
   late TextEditingController investAmountController;
-  bool invested = false;
 
   @override
   void initState() {
@@ -56,7 +55,7 @@ class _InvestCardState extends State<InvestCard> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
-                  rating("4.6")
+                  rating(widget.investCardDTO.rating)
                 ],
               ),
               const SizedBox(
@@ -109,9 +108,6 @@ class _InvestCardState extends State<InvestCard> {
                         color: Colors.deepPurpleAccent),
                     child: MaterialButton(
                       onPressed: () {
-                        if (invested) {
-                          return;
-                        }
                         showModalBottomSheet<void>(
                           context: context,
                           isScrollControlled: true,
@@ -166,10 +162,9 @@ class _InvestCardState extends State<InvestCard> {
                                     child: MaterialButton(
                                       height: 48,
                                       onPressed: () {
-                                        invested = true;
                                         Navigator.pop(context);
                                         var snackBar = SnackBar(
-                                          content: Text('You have successfully invested ${investAmountController.text} ''rupees!'),
+                                          content: Text('You have successfully invested ₹ ${investAmountController.text}'),
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                       },
@@ -183,10 +178,10 @@ class _InvestCardState extends State<InvestCard> {
                           },
                         );
                       },
-                      child: !invested ? const Text(
+                      child: const Text(
                         "Invest Now",
                         style: TextStyle(color: Colors.white),
-                      ) : const Icon(Icons.done,),
+                      ),
                     ),
                   ),
                 ],

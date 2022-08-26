@@ -1,3 +1,5 @@
+import 'package:farm_olx/enter_mobile_number_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -121,6 +123,25 @@ class _MyFormState extends State<MyForm> {
                     child: const Text('Submit', style: TextStyle(fontSize: 20,color: Colors.white),),
                   ),
                 ),
+                const SizedBox(height: 48,),
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.grey,),
+                    width: 100,
+                    child: MaterialButton(
+                      height: 20,
+                      elevation: 10,
+                      textColor: Colors.white,
+                      onPressed: () async {
+                        FirebaseAuth.instance.signOut();
+                        await Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                          return EnterMobileNumberScreen();
+                        }));
+                      },
+                      child: const Text("Sign out"),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -216,9 +237,9 @@ class _FriendTextFieldsState extends State<FriendTextFields> {
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _nameController.text = _MyFormState.farmersList[widget.index] ?? '';
-      _acresController.text = _MyFormState.acresList[widget.index] ?? '';
-      _idCardController.text = _MyFormState.idCardList[widget.index] ?? '';
+      _nameController.text = _MyFormState.farmersList[widget.index];
+      _acresController.text = _MyFormState.acresList[widget.index];
+      _idCardController.text = _MyFormState.idCardList[widget.index];
     });
 
     return Column(
